@@ -1,0 +1,23 @@
+{
+  "name": "zensleep-backend",
+  "version": "0.1.0",
+  "description": "ZenSleep API: ingest wearable sleep signals, compute sleep score and stress inference, serve dashboard data",
+  "type": "module",
+  "private": true,
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "lowdb": "^7.0.1",
+    "nanoid": "^5.0.7"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

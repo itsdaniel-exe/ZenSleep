@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Env files (never commit secrets)
+.env
+.env.local
+*.env.local
+
+# Backend local datastore
+backend/data/
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Arduino build artifacts
+firmware/**/build/
+*.hex
