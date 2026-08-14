@@ -7,7 +7,11 @@ import { demoRouter } from "./routes/demo.js";
 
 const app = express();
 const PORT = process.env.PORT || 4790;
-const corsOrigin = (process.env.CORS_ORIGIN || "http://localhost:5173").split(",");
+const corsOriginEnv = process.env.CORS_ORIGIN || "http://localhost:5173";
+// "*" must be passed through as-is: the cors package only treats the literal
+// string "*" as a wildcard, not an array containing it, so splitting on
+// commas first would silently turn it into a same-origin-only allowlist.
+const corsOrigin = corsOriginEnv === "*" ? "*" : corsOriginEnv.split(",");
 
 app.use(cors({ origin: corsOrigin }));
 app.use(express.json({ limit: "2mb" })); // a full night of 30s epochs is small, but leave headroom

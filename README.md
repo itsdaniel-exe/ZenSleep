@@ -70,6 +70,13 @@ actual hardware — see [`firmware/README.md`](firmware/README.md) for wiring,
 required libraries, and its one known limitation (heart-rate beat detection
 isn't wired up yet; motion-based scoring works standalone).
 
+## Deploying
+
+[`render.yaml`](render.yaml) is a one-click Render Blueprint that hosts both
+the API and the dashboard on Render's free tier. See
+[`docs/deployment.md`](docs/deployment.md) for the full walkthrough
+(account signup, env var wiring, and free-tier tradeoffs like cold starts).
+
 ## Development
 
 Each package has its own tests/lint:
@@ -88,6 +95,7 @@ push and pull request against `main`/`master`.
 - [`docs/business-model.md`](docs/business-model.md) — revenue, market sizing, IP strategy
 - [`docs/architecture.md`](docs/architecture.md) — system design and where this implementation
   intentionally diverges from the original AWS/Firebase-based pitch
+- [`docs/deployment.md`](docs/deployment.md) — hosting on Render, step by step
 
 ## License
 

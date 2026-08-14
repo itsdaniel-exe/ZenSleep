@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: zensleep-backend
+    env: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: CORS_ORIGIN
+        value: "*" # tighten to the frontend's exact URL once known, see docs/deployment.md
+      - key: ANTHROPIC_API_KEY
+        sync: false # optional; leave unset in the Render dashboard for the offline template fallback
+      - key: ANTHROPIC_MODEL
+        value: claude-sonnet-4-5
+
+  - type: web
+    name: zensleep-web
+    env: static
+    rootDir: web
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false # set to the backend service's URL after it deploys, see docs/deployment.md
