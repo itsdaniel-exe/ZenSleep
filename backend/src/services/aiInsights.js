@@ -29,12 +29,15 @@ function templateNarrative(scored) {
     High: "your signals point to significant overnight stress",
   }[stressLevel];
 
+  const encouraging =
+    overallScore >= 80 && stressLevel === "Low"
+      ? "Keep this routine going — it's working."
+      : "Small, consistent changes to your wind-down routine should help over the next few nights.";
+
   return (
     `You had ${quality} night, scoring ${overallScore}/100. ` +
     `You slept about ${metrics.durationHours}h with ${metrics.awakenings} awakening(s) and ${stressPhrase}. ` +
-    (overallScore >= 80
-      ? "Keep this routine going — it's working."
-      : "Small, consistent changes to your wind-down routine should help over the next few nights.")
+    encouraging
   );
 }
 
