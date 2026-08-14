@@ -48,10 +48,11 @@ never depend on an external API.
 python scripts/simulate_device.py --user demo-user --profile stressed
 ```
 
-## Tests
+## Tests & linting
 
 ```bash
 npm test
+npm run lint
 ```
 
 ## Storage

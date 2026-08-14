@@ -64,8 +64,9 @@ distribution partners.
 Per the pitch deck: software copyright on core AI logic, trade-secret
 protection for the sleep-scoring/prompt-engineering workflows, with future
 patent filings planned for the sleep analysis and recommendation
-methodology. **This is why this repository does not include an open-source
-license file** — talk to the team before adding one.
+methodology. **This is why this repository ships an all-rights-reserved
+[`LICENSE`](../LICENSE) instead of an open-source one** — talk to the team
+before changing that.
 
 ## Team
 

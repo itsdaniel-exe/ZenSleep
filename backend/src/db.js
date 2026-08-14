@@ -38,5 +38,5 @@ export async function getHistory(userId, limit = 14) {
     .filter((s) => s.userId === userId)
     .sort((a, b) => a.createdAt - b.createdAt)
     .slice(-limit)
-    .map(({ epochs, ...summary }) => summary); // trend view only needs the scored summary
+    .map(({ epochs: _epochs, ...summary }) => summary); // trend view only needs the scored summary
 }

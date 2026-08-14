@@ -29,3 +29,10 @@ dashboard instantly.
   you have project keys — the rest of the app is unaffected either way.
 - `src/api.js` is the only file that talks to the backend; point
   `VITE_API_URL` at your deployed API.
+
+## Linting & build
+
+```bash
+npm run lint
+npm run build   # outputs to dist/
+```

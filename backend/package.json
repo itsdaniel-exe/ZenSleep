@@ -4,11 +4,13 @@
   "description": "ZenSleep API: ingest wearable sleep signals, compute sleep score and stress inference, serve dashboard data",
   "type": "module",
   "private": true,
+  "license": "UNLICENSED",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "test": "node --test \"test/**/*.test.js\""
+    "test": "node --test \"test/**/*.test.js\"",
+    "lint": "eslint ."
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -16,6 +18,11 @@
     "express": "^4.19.2",
     "lowdb": "^7.0.1",
     "nanoid": "^5.0.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "eslint": "^9.9.1",
+    "globals": "^15.9.0"
   },
   "engines": {
     "node": ">=18"

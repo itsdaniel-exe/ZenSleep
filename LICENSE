@@ -1,0 +1,15 @@
+Copyright (c) 2025-2026 The ZenSleep team (Harish S, Daniel Rupaan Kalery, Jeevaash K). All rights reserved.
+
+This repository and its contents (source code, firmware, documentation, and
+associated assets) are proprietary and confidential. No license, express or
+implied, to any intellectual property rights is granted by viewing or
+accessing this repository.
+
+No part of this repository may be copied, modified, distributed, sublicensed,
+or used to create derivative works without prior written permission from the
+copyright holders.
+
+This notice reflects the project's current IP strategy of protecting the
+sleep-scoring and AI-recommendation logic as trade secrets pending future
+patent filings (see docs/business-model.md). It may be replaced with an
+open-source license for specific components at the team's discretion.

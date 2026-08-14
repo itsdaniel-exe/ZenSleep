@@ -1,5 +1,7 @@
 # ZenSleep
 
+[![CI](https://github.com/itsdaniel-exe/ZenSleep/actions/workflows/ci.yml/badge.svg)](https://github.com/itsdaniel-exe/ZenSleep/actions/workflows/ci.yml)
+
 **Intelligent stress inference from behavioral sleep signals.**
 
 ZenSleep is a non-wearable-friction sleep tracker: an ESP32 band captures
@@ -68,6 +70,18 @@ actual hardware — see [`firmware/README.md`](firmware/README.md) for wiring,
 required libraries, and its one known limitation (heart-rate beat detection
 isn't wired up yet; motion-based scoring works standalone).
 
+## Development
+
+Each package has its own tests/lint:
+
+```bash
+cd backend && npm test && npm run lint
+cd web && npm run lint && npm run build
+```
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs both on every
+push and pull request against `main`/`master`.
+
 ## Docs
 
 - [`docs/problem-statement.md`](docs/problem-statement.md) — who this is for and why
@@ -77,9 +91,9 @@ isn't wired up yet; motion-based scoring works standalone).
 
 ## License
 
-No license file is included yet — the pitch deck's business plan calls for
-trade-secret/patent protection on the AI scoring logic, which is
-incompatible with a permissive open-source license. Decide on licensing
-(private repo, proprietary notice, or open-source specific pieces) before
-this goes public. See the IP strategy note in
-[`docs/business-model.md`](docs/business-model.md).
+All rights reserved — see [`LICENSE`](LICENSE). The pitch deck's business
+plan calls for trade-secret/patent protection on the AI scoring logic, so
+this repo defaults to a proprietary notice rather than an open-source
+license. See the IP strategy note in
+[`docs/business-model.md`](docs/business-model.md) if that needs to change
+for specific components later.
