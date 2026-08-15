@@ -15,8 +15,24 @@ Proto ID IR2025-947774).
 
 This repo is a working, from-scratch implementation of that pitch: real
 accounts (signup/login, D1-backed), a functioning scoring engine, API,
-dashboard, and firmware sketch, deployed as a single Cloudflare Worker with
-a D1 database.
+dashboard with a sleep-history calendar, and firmware sketch, deployed as a
+single Cloudflare Worker with a D1 database.
+
+## What's here
+
+- **Accounts** — signup/login, sessions via a signed httpOnly cookie, data
+  scoped per-account
+- **Scoring engine** — turns motion + heart-rate epochs into a 0-100 score,
+  a Low/Moderate/High stress inference, and prioritized recommendations,
+  entirely rule-based and explainable (see [How scoring works](#how-scoring-works))
+- **Dashboard** — one hero report (score, narrative, recommendations) per
+  night, a calendar to browse past nights, and a motion/trend detail view
+- **AI narrative layer** — optional Claude-generated summary on top of the
+  scoring output, with an offline template fallback
+- **Firmware** — ESP32 + MPU6050 + MAX30102 Arduino sketch (no physical
+  hardware exists yet - see [Firmware](#firmware))
+- **No hardware needed to try it** — sample nights can be generated from
+  the dashboard itself
 
 ## Repository layout
 
@@ -39,17 +55,21 @@ npx wrangler dev                                        # http://localhost:8787
 ```
 
 Open `http://localhost:8787`, sign up (any email/password — it's your own
-local D1 instance), then click "Generate good/restless/stressed night" —
-this simulates a night of wearable data server-side and runs it through the
+local D1 instance). A new account auto-generates one sample night so you
+land straight on a working dashboard; use "+ add another sample night" to
+add more (they land on different days so the calendar has something to
+show) — this simulates wearable data server-side and runs it through the
 real scoring pipeline, no ESP32 required. See
 [`backend/README.md`](backend/README.md) for the API and
 [`web/README.md`](web/README.md) for the dashboard (including fast-HMR
 frontend-only iteration).
 
-To exercise the same ingest endpoint from the command line instead:
+To exercise the same ingest endpoint from the command line instead (swap in
+your account's id from `GET /api/auth/me` — `/api/ingest` rejects unknown
+users):
 
 ```bash
-python backend/scripts/simulate_device.py --host http://localhost:8787 --user demo-user --profile stressed
+python backend/scripts/simulate_device.py --host http://localhost:8787 --user <your-account-id> --profile stressed
 ```
 
 ## How scoring works

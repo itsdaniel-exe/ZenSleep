@@ -1,10 +1,10 @@
 # ZenSleep Web Dashboard
 
-React (Vite) dashboard that shows sleep score, stress level, overnight
-motion, score trend, and AI-generated recommendations from the
-[backend API](../backend). In production it's served by the same Cloudflare
-Worker as the API (same origin, no CORS) — see
-[`../docs/deployment.md`](../docs/deployment.md).
+React (Vite) dashboard: a per-night report (score, stress, narrative,
+recommendations), a calendar to browse past nights, and detail charts
+(overnight motion, score trend), all from the [backend API](../backend). In
+production it's served by the same Cloudflare Worker as the API (same
+origin, no CORS) — see [`../docs/deployment.md`](../docs/deployment.md).
 
 ## Run it (unified, matches production)
 
@@ -36,16 +36,29 @@ CORS (`backend/src/index.js`) exist at all — neither is needed in production.
 
 Real signup/login (`src/components/AuthForm.jsx`), backed by D1 - see
 [`../docs/architecture.md#auth`](../docs/architecture.md#auth). No hardware
-needed to try it though: once logged in, an empty account shows a small
-"try it with sample data" panel (`src/components/SampleDataPanel.jsx`) that
-calls the backend's synthetic-data endpoint, rather than requiring a real
-band to see the dashboard work.
+needed to try it though: signing up auto-generates one sample night before
+the dashboard ever renders, so a new account lands on a working report
+instead of an empty page. `src/components/SampleDataPanel.jsx` exports the
+two places you can add more afterwards - `SampleDataOnboarding` (empty
+state, one primary CTA) and `SampleDataUtility` (a small tucked-away
+control once data exists) - both call the backend's synthetic-data
+endpoint rather than requiring a real band.
 
 ## Structure
 
 - `src/api.js` is the only file that talks to the backend.
 - `App.jsx` switches between `LandingPage` (logged out) and the dashboard
-  (logged in) based on `GET /api/auth/me`.
+  (logged in) based on `GET /api/auth/me`, and owns which session is
+  "selected" (latest by default, or whatever calendar day was clicked).
+- `components/SleepReport.jsx` - the hero panel (ring, headline, narrative,
+  recommendations) for whichever night is selected.
+- `components/SleepCalendar.jsx` - month grid, color-coded by stress level;
+  clicking a day updates the selection in `App.jsx`.
+- `components/SleepDetails.jsx` - metrics, motion timeline (latest night
+  only - see `docs/architecture.md`), and the score trend chart.
+- `components/ScoreRing.jsx` / `ScoreGauge.jsx` - the score ring is a bare,
+  embeddable SVG (`ScoreRing`); `ScoreGauge` wraps it in a card for the
+  landing page's hero visual only.
 
 ## Linting & build
 

@@ -60,10 +60,13 @@ never depend on an external API.
 ## Testing without hardware
 
 ```bash
-# Option A: one-click, from the web dashboard's "Generate demo night" button
+# Option A: one-click, from the dashboard - sign up, then "+ add another
+# sample night" (or the onboarding CTA on a brand-new account)
 
-# Option B: from the command line
-python scripts/simulate_device.py --host http://localhost:8787 --user demo-user --profile stressed
+# Option B: from the command line - --user must be a real account's id
+# (sign up in the dashboard first, copy it from GET /api/auth/me), since
+# /api/ingest now rejects unknown users
+python scripts/simulate_device.py --host http://localhost:8787 --user <your-account-id> --profile stressed
 ```
 
 ## Tests & linting

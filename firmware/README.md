@@ -27,8 +27,9 @@ Set `#define SIMULATE_SENSORS 1` at the top of the sketch to run the full
 WiFi → epoch-buffering → HTTP POST pipeline with randomized sensor values —
 useful for validating connectivity before sensors arrive. For a
 no-microcontroller-at-all demo, use `backend/scripts/simulate_device.py` or
-the web dashboard's "Generate demo night" buttons instead, which exercise
-the exact same backend ingest endpoint.
+the web dashboard's sample-night controls instead (the onboarding CTA on a
+new account, or "+ add another sample night" once data exists), which
+exercise the exact same backend ingest endpoint.
 
 ## Known limitation
 

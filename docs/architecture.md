@@ -33,7 +33,7 @@ flowchart LR
     end
 
     subgraph Web["Dashboard (web/)"]
-        UI["React + Recharts\nscore, trend, timeline,\nrecommendations"]
+        UI["React + Recharts\nreport, calendar,\ntrend, timeline"]
     end
 
     FW -- "HTTPS POST JSON" --> Ingest
@@ -64,6 +64,14 @@ flowchart LR
   the built dashboard (Workers Static Assets, `run_worker_first: ["/api/*"]`
   in `backend/wrangler.jsonc`) - no CORS in production, no separate frontend
   host to keep in sync, no cold starts.
+- **History keeps summaries, not raw epochs.** `GET /api/sleep/history`
+  deliberately excludes the `epochs` column (by far the largest per session)
+  - the calendar and trend chart only need score/stress/metrics per night.
+  Only `GET /api/sleep/latest` returns full epochs, so the motion timeline
+  is only ever shown for the most recent night; browsing a past night via
+  the calendar shows everything except that one chart, with an explicit
+  note why (`web/src/components/SleepDetails.jsx`) rather than a
+  silently-missing chart.
 
 ## Auth
 

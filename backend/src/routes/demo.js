@@ -9,8 +9,8 @@ const PROFILES = ["good", "restless", "stressed"];
 
 demoRouter.use("/demo/*", requireAuth);
 
-// One-click "Generate demo night" for the logged-in user, used to explore
-// the product without real hardware or the Python simulator script.
+// One-click sample-night generation for the logged-in user, used to
+// explore the product without real hardware or the Python simulator script.
 demoRouter.post("/demo/generate", async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const profile = PROFILES.includes(body?.profile) ? body.profile : PROFILES[Math.floor(Math.random() * PROFILES.length)];
