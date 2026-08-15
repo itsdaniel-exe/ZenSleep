@@ -1,32 +1,26 @@
-import "dotenv/config";
-import express from "express";
-import cors from "cors";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { ingestRouter } from "./routes/ingest.js";
 import { sleepRouter } from "./routes/sleep.js";
 import { demoRouter } from "./routes/demo.js";
 
-const app = express();
-const PORT = process.env.PORT || 4790;
-const corsOriginEnv = process.env.CORS_ORIGIN || "http://localhost:5173";
-// "*" must be passed through as-is: the cors package only treats the literal
-// string "*" as a wildcard, not an array containing it, so splitting on
-// commas first would silently turn it into a same-origin-only allowlist.
-const corsOrigin = corsOriginEnv === "*" ? "*" : corsOriginEnv.split(",");
+const app = new Hono();
 
-app.use(cors({ origin: corsOrigin }));
-app.use(express.json({ limit: "2mb" })); // a full night of 30s epochs is small, but leave headroom
+// The dashboard and API are served from the same Worker in production (see
+// wrangler.jsonc's assets config), so this is really only needed for local
+// dev, where the Vite dev server (port 5173) and `wrangler dev` (port 8787)
+// are different origins.
+app.use("/api/*", cors());
 
-app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
+app.get("/api/health", (c) => c.json({ status: "ok" }));
 
-app.use("/api", ingestRouter);
-app.use("/api", sleepRouter);
-app.use("/api", demoRouter);
+app.route("/api", ingestRouter);
+app.route("/api", sleepRouter);
+app.route("/api", demoRouter);
 
-app.use((err, _req, res, _next) => {
+app.onError((err, c) => {
   console.error(err);
-  res.status(500).json({ error: "Internal server error" });
+  return c.json({ error: "Internal server error" }, 500);
 });
 
-app.listen(PORT, () => {
-  console.log(`ZenSleep API listening on http://localhost:${PORT}`);
-});
+export default app;

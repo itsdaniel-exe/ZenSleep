@@ -8,7 +8,7 @@ Useful for testing the backend independently of the browser demo button,
 or for load-testing ingest with many simulated users.
 
 Usage:
-    python scripts/simulate_device.py --host http://localhost:4000 --user demo-user --profile restless
+    python scripts/simulate_device.py --host http://localhost:8787 --user demo-user --profile restless
 """
 import argparse
 import random
@@ -70,7 +70,7 @@ def simulate_night(hours: float, profile: str):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--host", default="http://localhost:4790")
+    parser.add_argument("--host", default="http://localhost:8787")
     parser.add_argument("--user", default="demo-user")
     parser.add_argument("--hours", type=float, default=None, help="Night length; random 6.2-8.5h if omitted")
     parser.add_argument("--profile", choices=list(PROFILES), default="good")

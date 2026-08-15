@@ -4,6 +4,8 @@
 
 **Intelligent stress inference from behavioral sleep signals.**
 
+**Live**: https://zensleep.daniwork300.workers.dev
+
 ZenSleep is a non-wearable-friction sleep tracker: an ESP32 band captures
 overnight motion and heart-rate signals, a backend scores the night and
 infers a stress level, and a web dashboard presents the result with
@@ -12,44 +14,40 @@ Innovation Challenge 2025 submission (AICTE Productization Fellowship,
 Proto ID IR2025-947774).
 
 This repo is a working, from-scratch implementation of that pitch: a
-functioning scoring engine, API, dashboard, and firmware sketch, all runnable
-locally with no cloud account or physical hardware required.
+functioning scoring engine, API, dashboard, and firmware sketch, deployed as
+a single Cloudflare Worker with a D1 database.
 
 ## Repository layout
 
 ```
 firmware/   ESP32 + MPU6050 + MAX30102 Arduino sketch
-backend/    Express API — sleep scoring, stress inference, recommendations, AI narrative
-web/        React (Vite) dashboard
-docs/       Problem statement, business model, architecture (from the pitch deck)
+backend/    Cloudflare Worker (Hono) — sleep scoring, stress inference, recommendations, AI narrative, D1 storage
+web/        React (Vite) dashboard, served by the same Worker as static assets
+docs/       Problem statement, business model, architecture, deployment (from the pitch deck + this build)
 ```
 
 ## Quick start (no hardware needed)
 
 ```bash
-# 1. Backend
-cd backend
-npm install
-cp .env.example .env
-npm start          # http://localhost:4790
+cd web && npm install && npm run build   # produces web/dist
 
-# 2. Web dashboard (separate terminal)
-cd web
+cd ../backend
 npm install
-cp .env.example .env
-npm run dev         # http://localhost:5173
+npx wrangler d1 migrations apply zensleep-db --local   # first time only
+npx wrangler dev                                        # http://localhost:8787
 ```
 
-Open `http://localhost:5173` and click "Generate good/restless/stressed
+Open `http://localhost:8787` and click "Generate good/restless/stressed
 night" — this simulates a night of wearable data server-side and runs it
 through the real scoring pipeline, no ESP32 required. See
 [`backend/README.md`](backend/README.md) for the API and
-[`web/README.md`](web/README.md) for the dashboard.
+[`web/README.md`](web/README.md) for the dashboard (including fast-HMR
+frontend-only iteration).
 
 To exercise the same ingest endpoint from the command line instead:
 
 ```bash
-python backend/scripts/simulate_device.py --user demo-user --profile stressed
+python backend/scripts/simulate_device.py --host http://localhost:8787 --user demo-user --profile stressed
 ```
 
 ## How scoring works
@@ -59,9 +57,9 @@ epochs into a 0-100 sleep score (duration, continuity, sleep latency, HR
 stability) and a Low/Moderate/High stress inference, entirely rule-based and
 explainable — no external API required. An optional AI layer
 (`backend/src/services/aiInsights.js`) adds a narrative summary on top if an
-`ANTHROPIC_API_KEY` is configured; without one, a deterministic template is
-used instead. See [`docs/architecture.md`](docs/architecture.md) for the full
-data flow and the reasoning behind these choices.
+`ANTHROPIC_API_KEY` secret is configured; without one, a deterministic
+template is used instead. See [`docs/architecture.md`](docs/architecture.md)
+for the full data flow and the reasoning behind these choices.
 
 ## Firmware
 
@@ -72,10 +70,16 @@ isn't wired up yet; motion-based scoring works standalone).
 
 ## Deploying
 
-[`render.yaml`](render.yaml) is a one-click Render Blueprint that hosts both
-the API and the dashboard on Render's free tier. See
-[`docs/deployment.md`](docs/deployment.md) for the full walkthrough
-(account signup, env var wiring, and free-tier tradeoffs like cold starts).
+One Cloudflare Worker, one command:
+
+```bash
+cd web && npm run build
+cd ../backend && npm run deploy
+```
+
+See [`docs/deployment.md`](docs/deployment.md) for one-time setup (D1
+database creation, migrations) and why this shape was chosen over a
+traditional server host.
 
 ## Development
 
@@ -86,8 +90,8 @@ cd backend && npm test && npm run lint
 cd web && npm run lint && npm run build
 ```
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs both on every
-push and pull request against `main`/`master`.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs both, plus a
+Worker bundle dry-run, on every push and pull request against `main`/`master`.
 
 ## Docs
 
@@ -95,7 +99,7 @@ push and pull request against `main`/`master`.
 - [`docs/business-model.md`](docs/business-model.md) — revenue, market sizing, IP strategy
 - [`docs/architecture.md`](docs/architecture.md) — system design and where this implementation
   intentionally diverges from the original AWS/Firebase-based pitch
-- [`docs/deployment.md`](docs/deployment.md) — hosting on Render, step by step
+- [`docs/deployment.md`](docs/deployment.md) — hosting on Cloudflare Workers + D1, step by step
 
 ## License
 

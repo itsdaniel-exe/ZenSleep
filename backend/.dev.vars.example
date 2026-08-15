@@ -1,0 +1,7 @@
+# Local-only secrets for `wrangler dev` (copy to .dev.vars, which is gitignored).
+# In production this is set with: wrangler secret put ANTHROPIC_API_KEY
+#
+# Optional: enables real AI-generated narrative insights instead of the
+# built-in template-based fallback. Get a key from https://console.anthropic.com
+# Leave unset to run fully offline with no external calls.
+ANTHROPIC_API_KEY=

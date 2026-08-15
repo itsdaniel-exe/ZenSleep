@@ -5,9 +5,10 @@ node_modules/
 .env
 .env.local
 *.env.local
+.dev.vars
 
-# Backend local datastore
-backend/data/
+# Wrangler local state (local D1 sqlite, cache)
+.wrangler/
 
 # Build output
 dist/

@@ -38,7 +38,7 @@ MAX30105 particleSensor;
 // ---- Configuration ----------------------------------------------------
 const char *WIFI_SSID = "YOUR_WIFI_SSID";
 const char *WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
-const char *API_BASE_URL = "http://192.168.1.100:4790"; // point at your backend's LAN IP or deployed URL
+const char *API_BASE_URL = "https://zensleep.daniwork300.workers.dev"; // deployed backend; use https:// (WiFiClientSecure/HTTPClient handles TLS)
 const char *DEVICE_USER_ID = "demo-user"; // maps to a dashboard user
 
 const unsigned long EPOCH_MS = 30000;       // 30s per epoch, matches backend EPOCH_SECONDS

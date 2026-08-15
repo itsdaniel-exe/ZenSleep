@@ -3,7 +3,8 @@
 ZenSleep is a hardware-to-dashboard pipeline: a non-wearable-friendly band
 captures raw motion + heart-rate signals, a backend turns them into a sleep
 score and stress inference, and a web dashboard presents the result with
-personalized recommendations.
+personalized recommendations. Everything server-side runs as a single
+Cloudflare Worker - see [`deployment.md`](deployment.md).
 
 ```mermaid
 flowchart LR
@@ -15,13 +16,14 @@ flowchart LR
         MAX --> FW
     end
 
-    subgraph Backend["API (backend/)"]
-        Ingest["/api/ingest"]
+    subgraph Worker["Cloudflare Worker (backend/)"]
+        Ingest["/api/ingest (Hono)"]
         Score["Sleep scoring engine\n(duration, continuity,\nlatency, HR stability)"]
         Stress["Stress inference"]
         Rec["Rule-based\nrecommendations"]
         AI["AI narrative insight\n(Claude, optional)"]
-        DB[("Session store")]
+        DB[("D1 (SQLite)")]
+        Assets["Static assets\n(web/dist)"]
         Ingest --> Score --> Stress
         Score --> Rec
         Score --> AI
@@ -36,6 +38,7 @@ flowchart LR
 
     FW -- "HTTPS POST JSON" --> Ingest
     DB -- "GET /api/sleep/:userId/latest\nGET /api/sleep/:userId/history" --> UI
+    Assets -. "same origin, same deploy" .-> UI
 ```
 
 ## Why this shape
@@ -55,13 +58,16 @@ flowchart LR
   lets the web app (and this whole repo) be demoed convincingly with zero
   physical devices, which matters for pitching to evaluators/investors who
   won't have a band on them.
+- **One deployment, one origin.** The Worker serves both `/api/*` (Hono) and
+  the built dashboard (Workers Static Assets, `run_worker_first: ["/api/*"]`
+  in `backend/wrangler.jsonc`) - no CORS in production, no separate frontend
+  host to keep in sync, no cold starts.
 
 ## Where this diverges from the original pitch deck
 
 The deck names AWS serverless + Firebase specifically. This implementation
-ships a small Express API and a local JSON datastore instead, so the whole
-system runs with `npm install && npm start` and no cloud account — genuinely
-useful for prototyping and demos. `backend/src/db.js` is a 4-function
-interface; swapping it for DynamoDB/Firestore/Postgres is a contained change
-that doesn't touch scoring, routing, or the frontend. See
-[`backend/README.md`](../backend/README.md) for the swap point.
+uses Cloudflare Workers + D1 instead - same "serverless, no server to
+manage" spirit, different vendor. `backend/src/db.js` is a 3-function
+interface (`saveSession`/`getLatestSession`/`getHistory`); swapping the
+underlying store is a contained change that doesn't touch scoring, routing,
+or the frontend. See [`backend/README.md`](../backend/README.md).

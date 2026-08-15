@@ -44,10 +44,11 @@ function templateNarrative(scored) {
 /**
  * @param {ReturnType<import("./sleepScoring.js").scoreSleepSession>} scored
  * @param {string[]} recommendations
+ * @param {{ANTHROPIC_API_KEY?: string, ANTHROPIC_MODEL?: string}} env Worker bindings (see wrangler.jsonc / `wrangler secret put`)
  * @returns {Promise<{text: string, source: "anthropic" | "template"}>}
  */
-export async function generateNarrativeInsight(scored, recommendations) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+export async function generateNarrativeInsight(scored, recommendations, env) {
+  const apiKey = env?.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return { text: templateNarrative(scored), source: "template" };
   }
@@ -61,7 +62,7 @@ export async function generateNarrativeInsight(scored, recommendations) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5",
+        model: env.ANTHROPIC_MODEL || "claude-sonnet-4-5",
         max_tokens: 200,
         messages: [{ role: "user", content: buildPrompt(scored, recommendations) }],
       }),
