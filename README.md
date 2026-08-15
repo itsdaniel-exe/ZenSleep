@@ -4,8 +4,8 @@
 
 **Intelligent stress inference from behavioral sleep signals.**
 
-Turns overnight movement and heart rate into a sleep score and a stress reading —
-no wearable, nothing to strap on, just a bedside band and real accounts to track it over time.
+A band captures overnight movement and heart rate, and turns it into a sleep
+score and a stress reading — with real accounts to track it over time.
 
 [**→ Live demo**](https://zensleep.daniwork300.workers.dev)
 
@@ -28,8 +28,8 @@ no wearable, nothing to strap on, just a bedside band and real accounts to track
 - 📅 **Sleep Calendar** — month grid color-coded by stress level; click any day to pull up that night's full report
 - 👤 **Real Accounts** — signup/login with PBKDF2-hashed passwords and a signed session cookie, data scoped per account
 - 📈 **Score Trend** — night-over-night delta plus a rolling trend chart
-- 🎛️ **Try It Without Hardware** — one click seeds a realistic sample night so the whole pipeline is demoable with zero physical devices
-- 🔌 **ESP32 Firmware** — MPU6050 + MAX30102 Arduino sketch, ready to flash to real hardware (none built yet)
+- 🎛️ **Sample Data** — one click seeds a realistic night so the dashboard has something to show right away
+- 🔌 **ESP32 Firmware** — MPU6050 + MAX30102 Arduino sketch for the band itself
 
 Built from the team's YUKTI Innovation Challenge 2025 submission (AICTE Productization
 Fellowship, Proto ID IR2025-947774) — this repo is a working, from-scratch implementation
@@ -84,9 +84,3 @@ creation, migrations).
 - [`docs/architecture.md`](docs/architecture.md) — system design, and where this
   implementation diverges from the original AWS/Firebase-based pitch
 - [`docs/deployment.md`](docs/deployment.md) — hosting on Cloudflare Workers + D1
-
-## License
-
-All rights reserved — see [`LICENSE`](LICENSE). The pitch deck's business plan calls
-for trade-secret/patent protection on the AI scoring logic, so this repo defaults to a
-proprietary notice rather than an open-source license.

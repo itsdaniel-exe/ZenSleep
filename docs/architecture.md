@@ -1,14 +1,14 @@
 # Architecture
 
-ZenSleep is a hardware-to-dashboard pipeline: a band with nothing to strap on
-captures raw motion + heart-rate signals, a backend turns them into a sleep
+ZenSleep is a hardware-to-dashboard pipeline: a band captures raw motion +
+heart-rate signals, a backend turns them into a sleep
 score and stress inference, and a web dashboard presents the result with
 personalized recommendations. Everything server-side runs as a single
 Cloudflare Worker - see [`deployment.md`](deployment.md).
 
 ```mermaid
 flowchart LR
-    subgraph Wearable["ESP32 Band (firmware/)"]
+    subgraph Band["ESP32 Band (firmware/)"]
         MPU["MPU6050\nmotion/restlessness"]
         MAX["MAX30102\nheart rate"]
         FW["Epoch buffer\n30s windows"]
@@ -43,7 +43,7 @@ flowchart LR
 
 ## Why this shape
 
-- **Epochs, not raw samples.** The wearable pre-aggregates into 30-second
+- **Epochs, not raw samples.** The band pre-aggregates into 30-second
   windows before sending, keeping payloads small and battery use low —
   matches the pitch's comfort and long-battery-life goals.
 - **Scoring is deterministic and local to the backend**, not delegated to an
@@ -54,12 +54,12 @@ flowchart LR
   falls back to a template if no API key is configured, so the product works
   fully offline and the core IP (the scoring/stress-inference logic) doesn't
   depend on an external vendor.
-- **The dashboard has no hardware dependency.** `/api/demo/generate` lets a
-  logged-in user (and this whole repo) be demoed convincingly with zero
-  physical devices, which matters for pitching to evaluators/investors who
-  won't have a band on them. It's deliberately demoted in the UI to a small
-  "try it with sample data" affordance rather than the primary call to
-  action - real accounts and real (eventual) hardware data are the point.
+- **The dashboard doesn't require a live device connection.**
+  `/api/demo/generate` seeds a realistic night so the product can be
+  demoed convincingly without a band physically connected at that moment.
+  It's deliberately demoted in the UI to a small "sample data" affordance
+  rather than the primary call to action - real accounts and real device
+  data are the point.
 - **One deployment, one origin.** The Worker serves both `/api/*` (Hono) and
   the built dashboard (Workers Static Assets, `run_worker_first: ["/api/*"]`
   in `backend/wrangler.jsonc`) - no CORS in production, no separate frontend
@@ -86,10 +86,10 @@ Real accounts, not a `localStorage` demo ID:
   (`requireAuth` middleware) and always operate on the logged-in user - the
   API never accepts an arbitrary `userId` from the client for these routes,
   so one user can't read another's sleep data by guessing an ID.
-- `/api/ingest` (the device path) is the one exception - a real ESP32 has no
+- `/api/ingest` (the device path) is the one exception - the ESP32 has no
   browser session to hand over, so it's still keyed by an explicit `userId`
-  in the body. That's a known gap for when real hardware exists; see the
-  comment in `backend/src/routes/ingest.js`.
+  in the body. See the comment in `backend/src/routes/ingest.js` for the
+  production hardening this needs (a per-device API key).
 - The cookie is `Secure` only when the request is actually HTTPS (checked
   per-request, not hardcoded), so it also works over plain `http://localhost`
   during local development.

@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "ZenSleep dashboard: sleep score, stress trend, and recommendations",
   "private": true,
-  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "dev": "vite",

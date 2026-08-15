@@ -1,6 +1,6 @@
 # ZenSleep Band Firmware
 
-Arduino sketch for the ESP32-based wearable: `zensleep_band/zensleep_band.ino`.
+Arduino sketch for the ESP32-based band: `zensleep_band/zensleep_band.ino`.
 
 ## Hardware
 
@@ -21,11 +21,11 @@ Arduino sketch for the ESP32-based wearable: `zensleep_band/zensleep_band.ino`.
    rejects ingest requests for a `userId` that doesn't exist.
 4. Flash to the board.
 
-## No hardware yet?
+## Bench-testing without sensors attached
 
 Set `#define SIMULATE_SENSORS 1` at the top of the sketch to run the full
 WiFi → epoch-buffering → HTTP POST pipeline with randomized sensor values —
-useful for validating connectivity before sensors arrive. For a
+useful for validating connectivity independent of the sensors. For a
 no-microcontroller-at-all demo, use `backend/scripts/simulate_device.py` or
 the web dashboard's sample-night controls instead (the onboarding CTA on a
 new account, or "+ add another sample night" once data exists), which

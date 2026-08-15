@@ -5,8 +5,8 @@ import ScoreGauge from "./ScoreGauge.jsx";
 
 const FEATURES = [
   {
-    title: "Nothing to wear",
-    body: "Movement and heart-rate sensing from a bedside band, not a wrist strap - no discomfort, no skin irritation, no charging anxiety.",
+    title: "Track it over time",
+    body: "A calendar of every night, color-coded by stress level - click any day to pull up that night's full report, not just today's.",
   },
   {
     title: "Insight, not just data",
@@ -45,15 +45,15 @@ export default function LandingPage({ onAuthenticated }) {
                 actually <span className="accent-text">improve sleep.</span>
               </h1>
               <p className="hero-sub">
-                ZenSleep is an AI-powered sleep intelligence platform: a non-wearable band
-                captures overnight movement and heart rate, and turns it into a sleep score,
+                ZenSleep is an AI-powered sleep intelligence platform: a band captures
+                overnight movement and heart rate, and turns it into a sleep score,
                 a stress reading, and concrete recommendations - not just a chart.
               </p>
               <div className="hero-actions">
                 <button className="btn-primary" onClick={() => setShowAuth(true)}>
                   Get started free
                 </button>
-                <span className="hero-hint">No credit card. No hardware required to try it.</span>
+                <span className="hero-hint">No credit card required.</span>
               </div>
             </div>
             <div className="hero-visual">

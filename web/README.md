@@ -35,14 +35,13 @@ CORS (`backend/src/index.js`) exist at all — neither is needed in production.
 ## Accounts
 
 Real signup/login (`src/components/AuthForm.jsx`), backed by D1 - see
-[`../docs/architecture.md#auth`](../docs/architecture.md#auth). No hardware
-needed to try it though: signing up auto-generates one sample night before
-the dashboard ever renders, so a new account lands on a working report
-instead of an empty page. `src/components/SampleDataPanel.jsx` exports the
-two places you can add more afterwards - `SampleDataOnboarding` (empty
-state, one primary CTA) and `SampleDataUtility` (a small tucked-away
-control once data exists) - both call the backend's synthetic-data
-endpoint rather than requiring a real band.
+[`../docs/architecture.md#auth`](../docs/architecture.md#auth). Signing up
+auto-generates one sample night before the dashboard ever renders, so a new
+account lands on a working report instead of an empty page.
+`src/components/SampleDataPanel.jsx` exports the two places you can add
+more afterwards - `SampleDataOnboarding` (empty state, one primary CTA) and
+`SampleDataUtility` (a small tucked-away control once data exists) - both
+call the backend's synthetic-data endpoint.
 
 ## Structure
 
