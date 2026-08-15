@@ -1,7 +1,7 @@
 import { scoreSleepSession } from "./sleepScoring.js";
 import { buildRecommendations } from "./recommendations.js";
 import { generateNarrativeInsight } from "./aiInsights.js";
-import { saveSession } from "../db.js";
+import { saveSession, getUserById } from "../db.js";
 
 /**
  * Turns raw epochs into a fully-scored session record and persists it.
@@ -13,7 +13,8 @@ import { saveSession } from "../db.js";
  *   today. Real device ingest never passes this (defaults to "now").
  */
 export async function processSession(db, env, { userId, epochs, meta = {}, daysAgo = 0 }) {
-  const scored = scoreSleepSession(epochs, meta);
+  const user = await getUserById(db, userId);
+  const scored = scoreSleepSession(epochs, meta, { targetSleepHours: user?.targetSleepHours ?? 8 });
   const recommendations = buildRecommendations(scored);
   const narrative = await generateNarrativeInsight(scored, recommendations, env);
 

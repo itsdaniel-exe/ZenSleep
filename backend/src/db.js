@@ -12,14 +12,43 @@ export async function createUser(db, { id, email, passwordHash, createdAt }) {
 export async function getUserByEmail(db, email) {
   const row = await db.prepare(`SELECT * FROM users WHERE email = ?`).bind(email).first();
   if (!row) return null;
-  return { id: row.id, email: row.email, passwordHash: row.password_hash, createdAt: row.created_at };
+  return {
+    id: row.id,
+    email: row.email,
+    passwordHash: row.password_hash,
+    createdAt: row.created_at,
+    name: row.name,
+    targetSleepHours: row.target_sleep_hours,
+  };
 }
 
 /** @param {D1Database} db */
 export async function getUserById(db, id) {
-  const row = await db.prepare(`SELECT id, email, created_at FROM users WHERE id = ?`).bind(id).first();
+  const row = await db
+    .prepare(`SELECT id, email, created_at, name, target_sleep_hours FROM users WHERE id = ?`)
+    .bind(id)
+    .first();
   if (!row) return null;
-  return { id: row.id, email: row.email, createdAt: row.created_at };
+  return { id: row.id, email: row.email, createdAt: row.created_at, name: row.name, targetSleepHours: row.target_sleep_hours };
+}
+
+/** @param {D1Database} db */
+export async function getPasswordHash(db, userId) {
+  const row = await db.prepare(`SELECT password_hash FROM users WHERE id = ?`).bind(userId).first();
+  return row?.password_hash ?? null;
+}
+
+/** @param {D1Database} db */
+export async function updateUserSettings(db, userId, { name, targetSleepHours }) {
+  await db
+    .prepare(`UPDATE users SET name = ?, target_sleep_hours = ? WHERE id = ?`)
+    .bind(name, targetSleepHours, userId)
+    .run();
+}
+
+/** @param {D1Database} db */
+export async function updateUserPassword(db, userId, passwordHash) {
+  await db.prepare(`UPDATE users SET password_hash = ? WHERE id = ?`).bind(passwordHash, userId).run();
 }
 
 /** @param {D1Database} db */

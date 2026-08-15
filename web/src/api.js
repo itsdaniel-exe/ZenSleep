@@ -66,3 +66,14 @@ export function getDevices() {
 export function deleteDevice(id) {
   return request(`/api/devices/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
+
+export function updateSettings(name, targetSleepHours) {
+  return request("/api/auth/me", { method: "PATCH", body: JSON.stringify({ name, targetSleepHours }) });
+}
+
+export function changePassword(currentPassword, newPassword) {
+  return request("/api/auth/change-password", {
+    method: "POST",
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+}

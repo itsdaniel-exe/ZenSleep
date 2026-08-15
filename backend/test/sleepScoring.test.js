@@ -87,3 +87,23 @@ test("recommendations praise a great night when the score is high", () => {
   const tips = buildRecommendations(scored);
   assert.ok(tips.some((t) => t.toLowerCase().includes("great night")));
 });
+
+test("targetSleepHours personalizes the duration sub-score, not a fixed 7-9h band", () => {
+  const epochs = epochsFor(6); // a fixed 6h night
+
+  const defaultTarget = scoreSleepSession(epochs); // implicit 8h goal - 6h is 1h under the low end of the ideal band
+  const lowerGoalUser = scoreSleepSession(epochs, {}, { targetSleepHours: 6 }); // 6h night, 6h goal - right on target
+
+  assert.equal(lowerGoalUser.metrics.targetSleepHours, 6);
+  assert.equal(lowerGoalUser.subscores.duration, 100, "6h should score a perfect duration sub-score against a 6h goal");
+  assert.ok(
+    lowerGoalUser.subscores.duration > defaultTarget.subscores.duration,
+    "the same 6h night should score better for a 6h-goal user than an 8h-goal user"
+  );
+});
+
+test("recommendations reference the user's actual target, not a hardcoded '7-9 hours'", () => {
+  const scored = scoreSleepSession(epochsFor(4), {}, { targetSleepHours: 9 });
+  const tips = buildRecommendations(scored);
+  assert.ok(tips.some((t) => t.includes("9h goal") || t.includes("8-10h")), tips.join(" | "));
+});

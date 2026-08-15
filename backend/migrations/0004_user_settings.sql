@@ -1,0 +1,2 @@
+ALTER TABLE users ADD COLUMN name TEXT;
+ALTER TABLE users ADD COLUMN target_sleep_hours REAL NOT NULL DEFAULT 8;

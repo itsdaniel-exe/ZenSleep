@@ -60,6 +60,9 @@ call the backend's synthetic-data endpoint.
   calendar (no extra API call).
 - `components/DevicesPanel.jsx` - pair a band (shows the generated API key
   once), list devices with a live/stale indicator from `lastSeenAt`, revoke.
+- `components/SettingsPanel.jsx` - display name, personal sleep goal (feeds
+  the scoring engine - see `docs/architecture.md`), change password. Calls
+  `onUpdated` back into `App.jsx`'s `user` state on save.
 - `components/ScoreRing.jsx` / `ScoreGauge.jsx` - the score ring is a bare,
   embeddable SVG (`ScoreRing`); `ScoreGauge` wraps it in a card for the
   landing page's hero visual only.

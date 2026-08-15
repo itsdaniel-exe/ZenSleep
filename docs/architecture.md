@@ -54,6 +54,12 @@ flowchart LR
   falls back to a template if no API key is configured, so the product works
   fully offline and the core IP (the scoring/stress-inference logic) doesn't
   depend on an external vendor.
+- **Scoring is personalized, not one-size-fits-all.** `users.target_sleep_hours`
+  (Settings, default 8h) is threaded through `processSession.js` into
+  `scoreSleepSession()`'s duration sub-score and into the duration-related
+  recommendation copy - a 6-hour night scores differently for someone with
+  a 6h goal than someone with an 8h goal. The pitch deck's "7-9 hours is
+  ideal" framing became the *default*, not a hardcoded assumption.
 - **The dashboard doesn't require a live device connection.**
   `/api/demo/generate` seeds a realistic night so the product can be
   demoed convincingly without a band physically connected at that moment.

@@ -60,9 +60,11 @@ function sleepLatencyMinutes(epochs) {
   return Math.round((epochs.length * EPOCH_SECONDS) / 60);
 }
 
-function durationScore(hours) {
-  if (hours >= 7 && hours <= 9) return 100;
-  const deviation = hours < 7 ? 7 - hours : hours - 9;
+function durationScore(hours, targetHours) {
+  const low = targetHours - 1;
+  const high = targetHours + 1;
+  if (hours >= low && hours <= high) return 100;
+  const deviation = hours < low ? low - hours : hours - high;
   return clamp(100 - deviation * 18);
 }
 
@@ -109,11 +111,16 @@ function inferStressLevel({ restlessnessRatio, awakenings, latency, hrCoefficien
 /**
  * @param {Array<{ts:number, motion:number, heartRate:number|null}>} epochs
  * @param {{lightsOffTs?: number, screenTimeMinutesBeforeBed?: number}} [meta]
+ * @param {{targetSleepHours?: number}} [options] targetSleepHours centers the
+ *   duration sub-score and drives duration-related recommendations - a
+ *   per-user goal (backend/src/db.js `users.target_sleep_hours`), not a
+ *   one-size-fits-all "7-9 hours is ideal" assumption. Defaults to 8.
  */
-export function scoreSleepSession(epochs, meta = {}) {
+export function scoreSleepSession(epochs, meta = {}, options = {}) {
   if (!Array.isArray(epochs) || epochs.length === 0) {
     throw new Error("epochs must be a non-empty array");
   }
+  const targetSleepHours = options.targetSleepHours ?? 8;
 
   const durationHours = (epochs.length * EPOCH_SECONDS) / 3600;
   const restlessEpochs = epochs.filter((e) => e.motion > MOVEMENT_THRESHOLD).length;
@@ -127,7 +134,7 @@ export function scoreSleepSession(epochs, meta = {}) {
   const hrCoefficientOfVariation = hrValues.length >= 5 ? hrSd / hrMean : null;
 
   const subscores = {
-    duration: Math.round(durationScore(durationHours)),
+    duration: Math.round(durationScore(durationHours, targetSleepHours)),
     continuity: Math.round(continuityScore(restlessnessRatio, awakenings)),
     latency: Math.round(latencyScore(latency)),
     hrStability: Math.round(hrStabilityScore(hrValues)),
@@ -159,6 +166,7 @@ export function scoreSleepSession(epochs, meta = {}) {
       hrMean: hrMean !== null ? Math.round(hrMean) : null,
       hrStdDev: hrValues.length ? Math.round(hrSd * 10) / 10 : null,
       screenTimeMinutesBeforeBed: meta.screenTimeMinutesBeforeBed ?? null,
+      targetSleepHours,
     },
   };
 }

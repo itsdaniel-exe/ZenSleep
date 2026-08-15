@@ -23,6 +23,7 @@ score and a stress reading — with real accounts to track it over time.
 ## What it does
 
 - 🌙 **Sleep Scoring Engine** — turns 30-second motion/heart-rate epochs into a 0–100 score across duration, continuity, latency, and HR stability, entirely rule-based and explainable
+- ⚙️ **Personal Sleep Goal** — set your own target hours/night in Settings; the duration sub-score and recommendations are centered on *your* goal, not a fixed "7-9h is ideal" assumption
 - 😰 **Stress Inference** — a Low/Moderate/High reading from restlessness, awakenings, and heart-rate variability
 - 🤖 **AI Narrative Insight** — optional Claude-generated nightly summary, with a deterministic offline template as fallback
 - 📅 **Sleep Calendar** — month grid color-coded by stress level; click any day to pull up that night's full report

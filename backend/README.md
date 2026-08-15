@@ -31,6 +31,8 @@ for how it works.
 | POST | `/api/auth/login` | — | `{email, password}` → sets the session cookie |
 | POST | `/api/auth/logout` | — | Clears the session cookie |
 | GET | `/api/auth/me` | cookie | Current user, or 401 |
+| PATCH | `/api/auth/me` | cookie | `{name, targetSleepHours}` → updates profile; `targetSleepHours` feeds the scoring engine (see below) |
+| POST | `/api/auth/change-password` | cookie | `{currentPassword, newPassword}` |
 | POST | `/api/devices` | cookie | `{name}` → pairs a new device, returns its API key (shown once, never again) |
 | GET | `/api/devices` | cookie | List the logged-in user's devices with `lastSeenAt` |
 | DELETE | `/api/devices/:id` | cookie | Revoke a device - its API key stops working immediately |
@@ -49,6 +51,15 @@ how device pairing works.
 An **epoch** is a fixed 30-second window: `{ ts, motion: 0..1, heartRate: bpm|null }`.
 A full night is an array of epochs plus `meta` (`lightsOffTs`, `screenTimeMinutesBeforeBed`).
 This is exactly what [`firmware/zensleep_band`](../firmware/zensleep_band) sends from real hardware.
+
+## Personal sleep goal
+
+`users.target_sleep_hours` (default 8, set via `PATCH /api/auth/me`) isn't
+just stored - `processSession.js` fetches it and passes it into
+`scoreSleepSession()`, which centers the duration sub-score on it instead
+of a fixed 7-9h band, and `recommendations.js` references it directly in
+duration-related tip copy. See `test/sleepScoring.test.js` for the exact
+behavior this guarantees.
 
 ## AI narrative insight
 

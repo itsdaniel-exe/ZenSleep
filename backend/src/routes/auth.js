@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { hashPassword, verifyPassword } from "../services/password.js";
-import { createUser, getUserByEmail, getUserById } from "../db.js";
+import { createUser, getUserByEmail, getUserById, getPasswordHash, updateUserSettings, updateUserPassword } from "../db.js";
 import { createSession, clearSession, readSession, requireAuth } from "../services/session.js";
 
 export const authRouter = new Hono();
@@ -50,6 +50,37 @@ authRouter.get("/auth/me", async (c) => {
   const user = await getUserById(c.env.DB, session.sub);
   if (!user) return c.json({ error: "Not authenticated" }, 401);
   return c.json(user);
+});
+
+// A per-user sleep-duration goal that actually feeds the scoring engine
+// (sleepScoring.js's durationScore), not a cosmetic setting - see
+// docs/architecture.md. Defaults to 8h (migrations/0004_user_settings.sql).
+authRouter.patch("/auth/me", requireAuth, async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const name = typeof body.name === "string" ? body.name.trim().slice(0, 60) || null : null;
+  const targetSleepHours =
+    typeof body.targetSleepHours === "number" && body.targetSleepHours >= 4 && body.targetSleepHours <= 12
+      ? body.targetSleepHours
+      : 8;
+
+  await updateUserSettings(c.env.DB, c.get("userId"), { name, targetSleepHours });
+  const user = await getUserById(c.env.DB, c.get("userId"));
+  return c.json(user);
+});
+
+authRouter.post("/auth/change-password", requireAuth, async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const currentPassword = typeof body.currentPassword === "string" ? body.currentPassword : "";
+  const newPassword = typeof body.newPassword === "string" ? body.newPassword : "";
+
+  if (newPassword.length < 8) return c.json({ error: "New password must be at least 8 characters" }, 400);
+
+  const passwordHash = await getPasswordHash(c.env.DB, c.get("userId"));
+  const valid = passwordHash && (await verifyPassword(currentPassword, passwordHash));
+  if (!valid) return c.json({ error: "Current password is incorrect" }, 401);
+
+  await updateUserPassword(c.env.DB, c.get("userId"), await hashPassword(newPassword));
+  return c.json({ ok: true });
 });
 
 export { requireAuth };

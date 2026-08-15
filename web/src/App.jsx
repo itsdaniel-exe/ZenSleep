@@ -7,6 +7,7 @@ import SleepCalendar from "./components/SleepCalendar.jsx";
 import SleepDetails from "./components/SleepDetails.jsx";
 import WeeklySummary from "./components/WeeklySummary.jsx";
 import DevicesPanel from "./components/DevicesPanel.jsx";
+import SettingsPanel from "./components/SettingsPanel.jsx";
 import { SampleDataOnboarding, SampleDataUtility } from "./components/SampleDataPanel.jsx";
 
 const HISTORY_LIMIT = 90; // enough to populate a few months of the calendar
@@ -44,8 +45,14 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    // Keyed on the id, not the whole user object: updating settings
+    // (name/targetSleepHours) calls setUser() with a new object for the
+    // same account, which would otherwise re-trigger this, flip
+    // loadingData back on, and unmount/remount everything in <main> -
+    // including SettingsPanel mid-save, wiping its "Saved" confirmation.
     if (user) loadDashboard();
-  }, [user, loadDashboard]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deliberately user?.id, not user (see comment above)
+  }, [user?.id, loadDashboard]);
 
   async function handleAuthenticated(newUser, { isNewAccount } = {}) {
     if (isNewAccount) {
@@ -102,7 +109,7 @@ export default function App() {
   if (settingUp) {
     return (
       <div className="app">
-        <Header email={user.email} onSignOut={handleSignOut} />
+        <Header name={user.name} email={user.email} onSignOut={handleSignOut} />
         <p className="hint centered">Setting up your dashboard…</p>
       </div>
     );
@@ -119,7 +126,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <Header email={user.email} onSignOut={handleSignOut} />
+      <Header name={user.name} email={user.email} onSignOut={handleSignOut} />
 
       {error && <div className="error">{error}</div>}
 
@@ -146,6 +153,7 @@ export default function App() {
             history={history.slice(-14)}
           />
           <DevicesPanel />
+          <SettingsPanel user={user} onUpdated={setUser} />
           <div className="dashboard-footer">
             <SampleDataUtility onGenerate={handleGenerate} generating={generating} />
           </div>

@@ -24,13 +24,16 @@ const RULES = [
     severity: 2,
   },
   {
-    when: (m) => m.metrics.durationHours < 6,
-    tip: "Total sleep time was under 6 hours. Aim for 7-9 hours by shifting bedtime earlier rather than wake time later.",
+    when: (m) => m.metrics.durationHours < m.metrics.targetSleepHours - 2,
+    tip: (m) =>
+      `Total sleep time was well under your ${m.metrics.targetSleepHours}h goal. Aim for ${m.metrics.targetSleepHours - 1}-${
+        m.metrics.targetSleepHours + 1
+      }h by shifting bedtime earlier rather than wake time later.`,
     severity: 3,
   },
   {
-    when: (m) => m.metrics.durationHours > 9.5,
-    tip: "Sleep duration was unusually long, which can itself indicate poor sleep quality or recovery from a deficit.",
+    when: (m) => m.metrics.durationHours > m.metrics.targetSleepHours + 1.5,
+    tip: (m) => `Sleep duration was well above your ${m.metrics.targetSleepHours}h goal, which can itself indicate poor sleep quality or recovery from a deficit.`,
     severity: 1,
   },
   {
@@ -48,7 +51,7 @@ const RULES = [
 /** @param {ReturnType<import("./sleepScoring.js").scoreSleepSession>} scored */
 export function buildRecommendations(scored) {
   const matched = RULES.filter((r) => r.when(scored)).sort((a, b) => b.severity - a.severity);
-  const tips = matched.slice(0, 4).map((r) => r.tip);
+  const tips = matched.slice(0, 4).map((r) => (typeof r.tip === "function" ? r.tip(scored) : r.tip));
   if (tips.length === 0) {
     tips.push("Sleep metrics look balanced tonight — no specific action needed.");
   }
