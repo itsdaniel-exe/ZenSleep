@@ -39,7 +39,7 @@ function Stat({ icon, label, value }) {
 export default function MetricStrip({ metrics }) {
   if (!metrics) return null;
   return (
-    <div className="card metric-strip">
+    <div className="metric-strip">
       <Stat icon="duration" label="Duration" value={`${metrics.durationHours}h`} />
       <Stat icon="awakenings" label="Awakenings" value={metrics.awakenings} />
       <Stat icon="latency" label="Sleep latency" value={`${metrics.sleepLatencyMinutes}m`} />

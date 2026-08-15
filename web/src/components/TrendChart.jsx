@@ -9,9 +9,9 @@ export default function TrendChart({ history }) {
   }));
 
   return (
-    <div className="card">
+    <div className="detail-block">
       <h3>Score trend</h3>
-      <ResponsiveContainer width="100%" height={180}>
+      <ResponsiveContainer width="100%" height={150}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#232b3a" />
           <XAxis dataKey="date" stroke="#6c7a89" tick={{ fontSize: 11 }} />

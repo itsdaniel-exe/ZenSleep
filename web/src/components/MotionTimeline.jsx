@@ -12,9 +12,9 @@ export default function MotionTimeline({ epochs }) {
   }));
 
   return (
-    <div className="card">
+    <div className="detail-block">
       <h3>Overnight motion</h3>
-      <ResponsiveContainer width="100%" height={220}>
+      <ResponsiveContainer width="100%" height={180}>
         <AreaChart data={data}>
           <defs>
             <linearGradient id="motionFill" x1="0" y1="0" x2="0" y2="1">

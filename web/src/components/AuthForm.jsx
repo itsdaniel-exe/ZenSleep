@@ -14,7 +14,7 @@ export default function AuthForm({ onAuthenticated, onCancel }) {
     setSubmitting(true);
     try {
       const user = mode === "signup" ? await signup(email, password) : await login(email, password);
-      onAuthenticated(user);
+      onAuthenticated(user, { isNewAccount: mode === "signup" });
     } catch (err) {
       setError(err.message);
     } finally {
