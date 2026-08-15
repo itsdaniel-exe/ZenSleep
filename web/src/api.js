@@ -51,6 +51,6 @@ export function getHistory(limit = 14) {
   return request(`/api/sleep/history?limit=${limit}`);
 }
 
-export function generateDemoNight(profile) {
-  return request("/api/demo/generate", { method: "POST", body: JSON.stringify({ profile }) });
+export function generateDemoNight(profile, daysAgo = 0) {
+  return request("/api/demo/generate", { method: "POST", body: JSON.stringify({ profile, daysAgo }) });
 }

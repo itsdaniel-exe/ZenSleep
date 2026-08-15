@@ -14,7 +14,8 @@ demoRouter.use("/demo/*", requireAuth);
 demoRouter.post("/demo/generate", async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const profile = PROFILES.includes(body?.profile) ? body.profile : PROFILES[Math.floor(Math.random() * PROFILES.length)];
+  const daysAgo = Number.isInteger(body?.daysAgo) && body.daysAgo >= 0 && body.daysAgo <= 365 ? body.daysAgo : 0;
   const { epochs, meta } = simulateNight({ profile });
-  const session = await processSession(c.env.DB, c.env, { userId: c.get("userId"), epochs, meta });
+  const session = await processSession(c.env.DB, c.env, { userId: c.get("userId"), epochs, meta, daysAgo });
   return c.json(session, 201);
 });

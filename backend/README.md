@@ -34,7 +34,7 @@ for how it works.
 | POST | `/api/ingest` | — (see note) | Submit a night of epochs (`{userId, epochs, meta}`), returns the scored session |
 | GET | `/api/sleep/latest` | cookie | Most recent scored session for the logged-in user |
 | GET | `/api/sleep/history?limit=14` | cookie | Recent sessions, oldest first, for trend charts |
-| POST | `/api/demo/generate` | cookie | Generates and ingests a synthetic night for the logged-in user (`profile`: `good`\|`restless`\|`stressed`) |
+| POST | `/api/demo/generate` | cookie | Generates and ingests a synthetic night for the logged-in user (`profile`: `good`\|`restless`\|`stressed`, `daysAgo`: backdates `createdAt` so repeated calls spread across the calendar instead of stacking on today) |
 
 `/api/ingest` is the device path (a real ESP32 has no browser session), so
 it's authenticated by an explicit `userId` in the body rather than the
