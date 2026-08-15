@@ -1,4 +1,26 @@
-// D1 (SQLite) datastore. See migrations/0001_initial_schema.sql for the schema.
+// D1 (SQLite) datastore. See migrations/*.sql for the schema.
+
+/** @param {D1Database} db */
+export async function createUser(db, { id, email, passwordHash, createdAt }) {
+  await db
+    .prepare(`INSERT INTO users (id, email, password_hash, created_at) VALUES (?, ?, ?, ?)`)
+    .bind(id, email, passwordHash, createdAt)
+    .run();
+}
+
+/** @param {D1Database} db */
+export async function getUserByEmail(db, email) {
+  const row = await db.prepare(`SELECT * FROM users WHERE email = ?`).bind(email).first();
+  if (!row) return null;
+  return { id: row.id, email: row.email, passwordHash: row.password_hash, createdAt: row.created_at };
+}
+
+/** @param {D1Database} db */
+export async function getUserById(db, id) {
+  const row = await db.prepare(`SELECT id, email, created_at FROM users WHERE id = ?`).bind(id).first();
+  if (!row) return null;
+  return { id: row.id, email: row.email, createdAt: row.created_at };
+}
 
 /** @param {D1Database} db */
 export async function saveSession(db, session) {

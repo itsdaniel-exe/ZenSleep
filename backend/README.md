@@ -21,12 +21,25 @@ Health check: `GET /api/health`.
 
 ## Endpoints
 
-| Method | Path | Description |
-|---|---|---|
-| POST | `/api/ingest` | Submit a night of epochs (`{userId, epochs, meta}`), returns the scored session |
-| GET | `/api/sleep/:userId/latest` | Most recent scored session for a user |
-| GET | `/api/sleep/:userId/history?limit=14` | Recent sessions, oldest first, for trend charts |
-| POST | `/api/demo/:userId/generate` | Generates and ingests a synthetic night (`profile`: `good`\|`restless`\|`stressed`) — no hardware needed |
+Auth (`src/routes/auth.js`, `src/services/session.js`) is a signed, httpOnly
+JWT cookie - see [`../docs/architecture.md`](../docs/architecture.md#auth)
+for how it works.
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/api/auth/signup` | — | `{email, password}` → creates an account, sets the session cookie |
+| POST | `/api/auth/login` | — | `{email, password}` → sets the session cookie |
+| POST | `/api/auth/logout` | — | Clears the session cookie |
+| GET | `/api/auth/me` | cookie | Current user, or 401 |
+| POST | `/api/ingest` | — (see note) | Submit a night of epochs (`{userId, epochs, meta}`), returns the scored session |
+| GET | `/api/sleep/latest` | cookie | Most recent scored session for the logged-in user |
+| GET | `/api/sleep/history?limit=14` | cookie | Recent sessions, oldest first, for trend charts |
+| POST | `/api/demo/generate` | cookie | Generates and ingests a synthetic night for the logged-in user (`profile`: `good`\|`restless`\|`stressed`) |
+
+`/api/ingest` is the device path (a real ESP32 has no browser session), so
+it's authenticated by an explicit `userId` in the body rather than the
+cookie - see the comment in `src/routes/ingest.js` for the production
+caveat (should move to a per-device API key once real hardware exists).
 
 ## Data model
 
@@ -62,11 +75,12 @@ npm run lint
 
 ## Storage
 
-Sessions persist to D1 (`migrations/0001_initial_schema.sql`) — real,
-durable storage that survives redeploys, unlike an in-memory or
-ephemeral-disk store. `src/db.js` is a 3-function interface
-(`saveSession`/`getLatestSession`/`getHistory`); the rest of the app only
-depends on those.
+Sessions and user accounts persist to D1 (`migrations/`) — real, durable
+storage that survives redeploys, unlike an in-memory or ephemeral-disk
+store. `src/db.js` is a small functional interface
+(`saveSession`/`getLatestSession`/`getHistory`/`createUser`/`getUserByEmail`/`getUserById`);
+the rest of the app only depends on those. Passwords are hashed with PBKDF2
+(`src/services/password.js`) - never stored or logged in plaintext.
 
 ## Deploying
 

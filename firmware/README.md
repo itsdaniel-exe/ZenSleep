@@ -16,6 +16,9 @@ Arduino sketch for the ESP32-based wearable: `zensleep_band/zensleep_band.ino`.
    `SparkFun MAX3010x Pulse and Proximity Sensor Library`, `ArduinoJson`.
 3. Edit the config block at the top of the `.ino`: WiFi SSID/password,
    `API_BASE_URL` (your backend's reachable address), `DEVICE_USER_ID`.
+   `DEVICE_USER_ID` must be a real account's user id (sign up in the web
+   dashboard first and copy the id from `GET /api/auth/me`) - the backend
+   rejects ingest requests for a `userId` that doesn't exist.
 4. Flash to the board.
 
 ## No hardware yet?

@@ -1,44 +1,53 @@
 import { useCallback, useEffect, useState } from "react";
-import { getLatest, getHistory, generateDemoNight } from "./api.js";
-import { getDemoUserId, firebaseEnabled } from "./firebase.js";
+import { getMe, getLatest, getHistory, generateDemoNight, logout } from "./api.js";
+import LandingPage from "./components/LandingPage.jsx";
+import Header from "./components/Header.jsx";
 import ScoreGauge from "./components/ScoreGauge.jsx";
 import MetricStrip from "./components/MetricStrip.jsx";
 import MotionTimeline from "./components/MotionTimeline.jsx";
 import TrendChart from "./components/TrendChart.jsx";
 import Recommendations from "./components/Recommendations.jsx";
-
-const PROFILES = ["good", "restless", "stressed"];
+import SampleDataPanel from "./components/SampleDataPanel.jsx";
 
 export default function App() {
-  const userId = getDemoUserId();
+  const [authChecked, setAuthChecked] = useState(false);
+  const [user, setUser] = useState(null);
+
   const [latest, setLatest] = useState(null);
   const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingData, setLoadingData] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
 
-  const load = useCallback(async () => {
+  useEffect(() => {
+    getMe()
+      .then(setUser)
+      .finally(() => setAuthChecked(true));
+  }, []);
+
+  const loadDashboard = useCallback(async () => {
+    setLoadingData(true);
     try {
       setError(null);
-      const [latestSession, hist] = await Promise.all([getLatest(userId), getHistory(userId)]);
+      const [latestSession, hist] = await Promise.all([getLatest(), getHistory()]);
       setLatest(latestSession);
       setHistory(hist || []);
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setLoadingData(false);
     }
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    if (user) loadDashboard();
+  }, [user, loadDashboard]);
 
   async function handleGenerate(profile) {
     setGenerating(true);
     try {
-      await generateDemoNight(userId, profile);
-      await load();
+      await generateDemoNight(profile);
+      await loadDashboard();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -46,33 +55,34 @@ export default function App() {
     }
   }
 
+  async function handleSignOut() {
+    await logout().catch(() => {});
+    setUser(null);
+    setLatest(null);
+    setHistory([]);
+  }
+
+  if (!authChecked) {
+    return <div className="app-loading" />;
+  }
+
+  if (!user) {
+    return <LandingPage onAuthenticated={setUser} />;
+  }
+
   return (
     <div className="app">
-      <header>
-        <h1>ZenSleep</h1>
-        <p className="subtitle">Intelligent stress inference from behavioral sleep signals</p>
-      </header>
-
-      <div className="demo-bar">
-        <span>Demo user: {userId}</span>
-        {!firebaseEnabled && <span className="badge">local demo mode</span>}
-        <div className="demo-buttons">
-          {PROFILES.map((p) => (
-            <button key={p} disabled={generating} onClick={() => handleGenerate(p)}>
-              Generate {p} night
-            </button>
-          ))}
-        </div>
-      </div>
+      <Header email={user.email} onSignOut={handleSignOut} />
 
       {error && <div className="error">{error}</div>}
 
-      {loading ? (
+      {loadingData ? (
         <p className="hint">Loading…</p>
       ) : !latest ? (
         <div className="empty-state">
-          <p>No sleep data yet. This app has no real hardware connected right now, so click a button above to</p>
-          <p>simulate a night from an ESP32 wearable and see the full pipeline run end to end.</p>
+          <h2>No sleep data yet</h2>
+          <p>No band connected to this account yet. Once one is, nights will show up here automatically.</p>
+          <SampleDataPanel onGenerate={handleGenerate} generating={generating} />
         </div>
       ) : (
         <main className="grid">
@@ -81,6 +91,7 @@ export default function App() {
           <Recommendations narrative={latest.narrative} recommendations={latest.recommendations} />
           <MotionTimeline epochs={latest.epochs} />
           <TrendChart history={history} />
+          <SampleDataPanel onGenerate={handleGenerate} generating={generating} compact />
         </main>
       )}
     </div>

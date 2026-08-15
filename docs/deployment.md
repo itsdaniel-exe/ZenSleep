@@ -25,6 +25,12 @@ Cloudflare account).
 npx wrangler d1 migrations apply zensleep-db --remote
 ```
 
+Set the session-signing secret (required - auth won't work without it):
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))" | npx wrangler secret put SESSION_SECRET
+```
+
 ## Deploying
 
 ```bash

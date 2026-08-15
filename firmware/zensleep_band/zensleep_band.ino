@@ -39,7 +39,7 @@ MAX30105 particleSensor;
 const char *WIFI_SSID = "YOUR_WIFI_SSID";
 const char *WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 const char *API_BASE_URL = "https://zensleep.daniwork300.workers.dev"; // deployed backend; use https:// (WiFiClientSecure/HTTPClient handles TLS)
-const char *DEVICE_USER_ID = "demo-user"; // maps to a dashboard user
+const char *DEVICE_USER_ID = "REPLACE_WITH_YOUR_ACCOUNT_USER_ID"; // sign up in the dashboard first, copy the id from GET /api/auth/me
 
 const unsigned long EPOCH_MS = 30000;       // 30s per epoch, matches backend EPOCH_SECONDS
 const unsigned long NIGHT_MS = 9UL * 3600 * 1000; // stop buffering / auto-upload after 9h as a safety cap

@@ -13,9 +13,10 @@ prioritized, actionable recommendations — built from the team's YUKTI
 Innovation Challenge 2025 submission (AICTE Productization Fellowship,
 Proto ID IR2025-947774).
 
-This repo is a working, from-scratch implementation of that pitch: a
-functioning scoring engine, API, dashboard, and firmware sketch, deployed as
-a single Cloudflare Worker with a D1 database.
+This repo is a working, from-scratch implementation of that pitch: real
+accounts (signup/login, D1-backed), a functioning scoring engine, API,
+dashboard, and firmware sketch, deployed as a single Cloudflare Worker with
+a D1 database.
 
 ## Repository layout
 
@@ -37,9 +38,10 @@ npx wrangler d1 migrations apply zensleep-db --local   # first time only
 npx wrangler dev                                        # http://localhost:8787
 ```
 
-Open `http://localhost:8787` and click "Generate good/restless/stressed
-night" — this simulates a night of wearable data server-side and runs it
-through the real scoring pipeline, no ESP32 required. See
+Open `http://localhost:8787`, sign up (any email/password — it's your own
+local D1 instance), then click "Generate good/restless/stressed night" —
+this simulates a night of wearable data server-side and runs it through the
+real scoring pipeline, no ESP32 required. See
 [`backend/README.md`](backend/README.md) for the API and
 [`web/README.md`](web/README.md) for the dashboard (including fast-HMR
 frontend-only iteration).

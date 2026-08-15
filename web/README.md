@@ -32,18 +32,20 @@ npm run dev                              # http://localhost:5173, HMR
 These are different origins (5173 vs 8787), which is why `VITE_API_URL` and
 CORS (`backend/src/index.js`) exist at all — neither is needed in production.
 
-## Demo mode
+## Accounts
 
-No hardware or account needed: the dashboard assigns a random `demo-*` user
-id (stored in `localStorage`, see `src/firebase.js`) and the "Generate ___
-night" buttons call the backend's synthetic-data endpoint to populate the
-dashboard instantly.
+Real signup/login (`src/components/AuthForm.jsx`), backed by D1 - see
+[`../docs/architecture.md#auth`](../docs/architecture.md#auth). No hardware
+needed to try it though: once logged in, an empty account shows a small
+"try it with sample data" panel (`src/components/SampleDataPanel.jsx`) that
+calls the backend's synthetic-data endpoint, rather than requiring a real
+band to see the dashboard work.
 
-## Going to production
+## Structure
 
-- `src/firebase.js` documents exactly where to wire real Firebase Auth once
-  you have project keys — the rest of the app is unaffected either way.
 - `src/api.js` is the only file that talks to the backend.
+- `App.jsx` switches between `LandingPage` (logged out) and the dashboard
+  (logged in) based on `GET /api/auth/me`.
 
 ## Linting & build
 

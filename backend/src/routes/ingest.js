@@ -1,10 +1,16 @@
 import { Hono } from "hono";
 import { processSession } from "../services/processSession.js";
+import { getUserById } from "../db.js";
 
 export const ingestRouter = new Hono();
 
 // Wearable (or the Python device simulator in scripts/) posts a full night
 // here as { userId, epochs: [{ts, motion, heartRate}], meta }.
+//
+// This is the device path, not the browser path - a real ESP32 in the field
+// has no session cookie. It's authenticated by `userId` alone for now, which
+// is fine for a prototype with no hardware yet; a real deployment should
+// replace this with a per-device API key (see firmware/README.md).
 ingestRouter.post("/ingest", async (c) => {
   const body = await c.req.json().catch(() => ({}));
   const { userId, epochs, meta } = body;
@@ -14,6 +20,9 @@ ingestRouter.post("/ingest", async (c) => {
   }
   if (!Array.isArray(epochs) || epochs.length === 0) {
     return c.json({ error: "epochs (non-empty array) is required" }, 400);
+  }
+  if (!(await getUserById(c.env.DB, userId))) {
+    return c.json({ error: "Unknown userId" }, 404);
   }
 
   try {

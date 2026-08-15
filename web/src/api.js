@@ -9,27 +9,48 @@ const BASE_URL = import.meta.env.VITE_API_URL || "";
 async function request(path, options) {
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: { "content-type": "application/json" },
+    credentials: "include", // send/receive the session cookie, incl. cross-origin dev
     ...options,
   });
   if (!res.ok) {
     if (res.status === 404) return null;
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `Request to ${path} failed (${res.status})`);
+    const err = new Error(body.error || `Request to ${path} failed (${res.status})`);
+    err.status = res.status;
+    throw err;
   }
   return res.json();
 }
 
-export function getLatest(userId) {
-  return request(`/api/sleep/${encodeURIComponent(userId)}/latest`);
+export function signup(email, password) {
+  return request("/api/auth/signup", { method: "POST", body: JSON.stringify({ email, password }) });
 }
 
-export function getHistory(userId, limit = 14) {
-  return request(`/api/sleep/${encodeURIComponent(userId)}/history?limit=${limit}`);
+export function login(email, password) {
+  return request("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password }) });
 }
 
-export function generateDemoNight(userId, profile) {
-  return request(`/api/demo/${encodeURIComponent(userId)}/generate`, {
-    method: "POST",
-    body: JSON.stringify({ profile }),
-  });
+export function logout() {
+  return request("/api/auth/logout", { method: "POST" });
+}
+
+export async function getMe() {
+  try {
+    return await request("/api/auth/me");
+  } catch (err) {
+    if (err.status === 401) return null;
+    throw err;
+  }
+}
+
+export function getLatest() {
+  return request("/api/sleep/latest");
+}
+
+export function getHistory(limit = 14) {
+  return request(`/api/sleep/history?limit=${limit}`);
+}
+
+export function generateDemoNight(profile) {
+  return request("/api/demo/generate", { method: "POST", body: JSON.stringify({ profile }) });
 }

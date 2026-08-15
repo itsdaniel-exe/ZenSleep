@@ -1,6 +1,10 @@
 # Local-only secrets for `wrangler dev` (copy to .dev.vars, which is gitignored).
-# In production this is set with: wrangler secret put ANTHROPIC_API_KEY
-#
+# In production these are set with: wrangler secret put <NAME>
+
+# Required: signs session cookies. Any random string works for local dev;
+# generate a real one for production, e.g. `openssl rand -base64 32`.
+SESSION_SECRET=local-dev-secret-change-me
+
 # Optional: enables real AI-generated narrative insights instead of the
 # built-in template-based fallback. Get a key from https://console.anthropic.com
 # Leave unset to run fully offline with no external calls.
