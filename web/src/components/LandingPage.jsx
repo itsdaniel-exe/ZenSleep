@@ -5,12 +5,24 @@ import ScoreGauge from "./ScoreGauge.jsx";
 
 const FEATURES = [
   {
-    title: "Track it over time",
-    body: "A calendar of every night, color-coded by stress level - click any day to pull up that night's full report, not just today's.",
+    title: "Pair your own band",
+    body: "Generate a private API key from your dashboard, paste it into the firmware, done. Revoke it any time and the band stops working immediately - no shared IDs, no guessing.",
   },
   {
     title: "Insight, not just data",
     body: "A rule-based scoring engine turns raw motion and heart rate into a sleep score, a stress level, and specific next steps - explainable, not a black box.",
+  },
+  {
+    title: "Track it over time",
+    body: "A calendar of every night, color-coded by stress level - click any day to pull up that night's full report, not just today's.",
+  },
+  {
+    title: "Know if it's actually connected",
+    body: "Your band's last-synced time shows right on the dashboard, so you know it's working without checking a serial monitor.",
+  },
+  {
+    title: "This week at a glance",
+    body: "Average score vs. last week, your best and roughest nights, how many nights ran hot on stress - the digest, not just a chart.",
   },
   {
     title: "Built for irregular sleepers",
