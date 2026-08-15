@@ -8,7 +8,10 @@ Useful for testing the backend independently of the browser demo button,
 or for load-testing ingest with many simulated users.
 
 Usage:
-    python scripts/simulate_device.py --host http://localhost:8787 --user demo-user --profile restless
+    python scripts/simulate_device.py --host http://localhost:8787 --device-key zs_... --profile restless
+
+--device-key comes from the dashboard: sign in, go to "Your band", and
+"+ connect a band" - the key is only shown once at creation time.
 """
 import argparse
 import random
@@ -71,7 +74,7 @@ def simulate_night(hours: float, profile: str):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", default="http://localhost:8787")
-    parser.add_argument("--user", default="demo-user")
+    parser.add_argument("--device-key", required=True, help="Device API key from the dashboard's 'Your band' section")
     parser.add_argument("--hours", type=float, default=None, help="Night length; random 6.2-8.5h if omitted")
     parser.add_argument("--profile", choices=list(PROFILES), default="good")
     args = parser.parse_args()
@@ -79,17 +82,25 @@ def main():
     hours = args.hours if args.hours is not None else random.uniform(6.2, 8.5)
     epochs, meta = simulate_night(hours, args.profile)
 
-    payload = json.dumps({"userId": args.user, "epochs": epochs, "meta": meta}).encode("utf-8")
+    payload = json.dumps({"epochs": epochs, "meta": meta}).encode("utf-8")
     req = urllib.request.Request(
         f"{args.host}/api/ingest",
         data=payload,
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {args.device_key}",
+            # *.workers.dev applies baseline bot protection that blocks
+            # urllib's default "Python-urllib/x.y" User-Agent (403, Cloudflare
+            # error 1010) - doesn't happen on a custom domain, and doesn't
+            # affect a browser or the ESP32's own HTTPClient, just this script.
+            "User-Agent": "ZenSleepDeviceSimulator/1.0",
+        },
         method="POST",
     )
 
     with urllib.request.urlopen(req) as resp:
         result = json.loads(resp.read())
-        print(f"Ingested {len(epochs)} epochs ({hours:.1f}h, profile={args.profile}) for user '{args.user}'")
+        print(f"Ingested {len(epochs)} epochs ({hours:.1f}h, profile={args.profile})")
         print(f"Score: {result['overallScore']}/100  Stress: {result['stressLevel']}")
 
 

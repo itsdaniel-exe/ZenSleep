@@ -4,6 +4,7 @@ import { authRouter } from "./routes/auth.js";
 import { ingestRouter } from "./routes/ingest.js";
 import { sleepRouter } from "./routes/sleep.js";
 import { demoRouter } from "./routes/demo.js";
+import { devicesRouter } from "./routes/devices.js";
 
 const app = new Hono();
 
@@ -26,6 +27,7 @@ app.route("/api", authRouter);
 app.route("/api", ingestRouter);
 app.route("/api", sleepRouter);
 app.route("/api", demoRouter);
+app.route("/api", devicesRouter);
 
 app.onError((err, c) => {
   console.error(err);

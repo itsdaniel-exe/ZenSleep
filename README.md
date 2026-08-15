@@ -26,10 +26,12 @@ score and a stress reading — with real accounts to track it over time.
 - 😰 **Stress Inference** — a Low/Moderate/High reading from restlessness, awakenings, and heart-rate variability
 - 🤖 **AI Narrative Insight** — optional Claude-generated nightly summary, with a deterministic offline template as fallback
 - 📅 **Sleep Calendar** — month grid color-coded by stress level; click any day to pull up that night's full report
+- 📊 **Weekly Summary** — this week's average vs. last week, best/roughest night, nights spent above Low stress
 - 👤 **Real Accounts** — signup/login with PBKDF2-hashed passwords and a signed session cookie, data scoped per account
+- 🔑 **Device Pairing** — generate a per-band API key from the dashboard, revoke it any time; the band never needs to know a user id, and last-synced status shows whether it's actually connected
 - 📈 **Score Trend** — night-over-night delta plus a rolling trend chart
-- 🎛️ **Sample Data** — one click seeds a realistic night so the dashboard has something to show right away
-- 🔌 **ESP32 Firmware** — MPU6050 + MAX30102 Arduino sketch for the band itself
+- 🎛️ **Sample Data** — one click seeds a realistic night so the dashboard has something to show without waiting on the band
+- 🔌 **ESP32 Firmware** — MPU6050 + MAX30102, real PPG heart-rate peak detection (not a stub), WiFi captive-portal setup
 
 Built from the team's YUKTI Innovation Challenge 2025 submission (AICTE Productization
 Fellowship, Proto ID IR2025-947774) — this repo is a working, from-scratch implementation

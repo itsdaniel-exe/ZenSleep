@@ -13,13 +13,35 @@ Arduino sketch for the ESP32-based band: `zensleep_band/zensleep_band.ino`.
 
 1. Open in Arduino IDE (or PlatformIO).
 2. Install libraries: `Adafruit MPU6050`, `Adafruit Unified Sensor`,
-   `SparkFun MAX3010x Pulse and Proximity Sensor Library`, `ArduinoJson`.
-3. Edit the config block at the top of the `.ino`: WiFi SSID/password,
-   `API_BASE_URL` (your backend's reachable address), `DEVICE_USER_ID`.
-   `DEVICE_USER_ID` must be a real account's user id (sign up in the web
-   dashboard first and copy the id from `GET /api/auth/me`) - the backend
-   rejects ingest requests for a `userId` that doesn't exist.
+   `SparkFun MAX3010x Pulse and Proximity Sensor Library`, `ArduinoJson`,
+   `WiFiManager` (tzapu/WiFiManager).
+3. In the dashboard, go to **Your band > connect a band**, name it, and
+   copy the generated API key (shown once). Paste it into `DEVICE_API_KEY`
+   at the top of the `.ino`. Adjust `API_BASE_URL` if you're pointing at a
+   different deployment than the default.
 4. Flash to the board.
+5. First boot: the ESP32 opens a WiFi access point named `ZenSleep-Setup`.
+   Connect a phone or laptop to it - a setup page opens automatically (or
+   browse to `192.168.4.1`), pick your real WiFi network and enter its
+   password. Credentials are saved to flash and reused on every boot after
+   that. To re-provision (new WiFi network), uncomment the
+   `wm.resetSettings()` line in `connectWiFi()`, reflash once, then comment
+   it back out and reflash again.
+
+## How heart rate is measured
+
+`sampleHeartRate()` runs real PPG peak detection on the MAX30102's IR
+reading, not a stub: it tracks the slow-moving DC baseline (tissue +
+ambient light) with an exponential moving average, detects each pulse as
+the faster-moving AC signal crossing a threshold above that baseline,
+enforces a refractory period so one beat can't double-count, and averages
+the last few inter-beat intervals into a stable BPM. It needs a much
+higher sample rate than motion does - `loop()` calls it every iteration
+(no throttling), while motion is sampled on its own 200ms timer.
+
+`HR_AC_THRESHOLD` is an empirical starting point; retune it against real
+skin-contact readings once the band is on-body (log raw IR values over
+serial and look at the actual pulse amplitude you get).
 
 ## Bench-testing without sensors attached
 
@@ -29,14 +51,5 @@ useful for validating connectivity independent of the sensors. For a
 no-microcontroller-at-all demo, use `backend/scripts/simulate_device.py` or
 the web dashboard's sample-night controls instead (the onboarding CTA on a
 new account, or "+ add another sample night" once data exists), which
-exercise the exact same backend ingest endpoint.
-
-## Known limitation
-
-`readHeartRate()` currently returns the raw IR-good/no-signal check but not a
-real BPM value — proper PPG beat detection (SparkFun's `heartRate.h`
-algorithm run over a continuous IR sample stream) still needs to be wired in
-before heart-rate data is meaningful from real hardware. Motion-based scoring
-works standalone; heart-rate epochs are simply omitted (`null`) until this is
-implemented, and the backend scoring engine already handles missing HR data
-gracefully (see `hrStabilityScore` in `backend/src/services/sleepScoring.js`).
+exercise the same scoring pipeline without going through the device path
+at all.

@@ -36,7 +36,7 @@ flowchart LR
         UI["React + Recharts\nreport, calendar,\ntrend, timeline"]
     end
 
-    FW -- "HTTPS POST JSON" --> Ingest
+    FW -- "HTTPS POST JSON\nAuthorization: Bearer device key" --> Ingest
     DB -- "GET /api/sleep/latest (cookie)\nGET /api/sleep/history (cookie)" --> UI
     Assets -. "same origin, same deploy" .-> UI
 ```
@@ -86,10 +86,22 @@ Real accounts, not a `localStorage` demo ID:
   (`requireAuth` middleware) and always operate on the logged-in user - the
   API never accepts an arbitrary `userId` from the client for these routes,
   so one user can't read another's sleep data by guessing an ID.
-- `/api/ingest` (the device path) is the one exception - the ESP32 has no
-  browser session to hand over, so it's still keyed by an explicit `userId`
-  in the body. See the comment in `backend/src/routes/ingest.js` for the
-  production hardening this needs (a per-device API key).
+- `/api/ingest` (the device path) uses a different mechanism entirely -
+  the ESP32 has no browser session to hand over. `POST /api/devices`
+  (cookie-authenticated, from the dashboard) generates a random 192-bit key
+  (`backend/src/services/apiKey.js`), stores only its SHA-256 hash, and
+  returns the raw key exactly once. The firmware sends it as
+  `Authorization: Bearer <key>`; `requireDeviceAuth`
+  (`backend/src/routes/devices.js`) hashes the presented key, looks up the
+  owning device, and resolves the request to that device's user - the
+  device never needs to know a user id, and revoking it
+  (`DELETE /api/devices/:id`) invalidates the key immediately since the
+  hash is simply deleted. Same fast-hash-for-lookup reasoning as API keys
+  generally (GitHub, Stripe, etc.): the key is already high-entropy, so
+  unlike passwords it doesn't need slow hashing to resist brute force.
+- Each successful `/api/ingest` call updates the device's `lastSeenAt`,
+  which is what lets the dashboard's "Your band" panel show a real
+  online/offline status instead of just "registered".
 - The cookie is `Secure` only when the request is actually HTTPS (checked
   per-request, not hardcoded), so it also works over plain `http://localhost`
   during local development.

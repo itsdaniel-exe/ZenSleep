@@ -31,15 +31,18 @@ for how it works.
 | POST | `/api/auth/login` | — | `{email, password}` → sets the session cookie |
 | POST | `/api/auth/logout` | — | Clears the session cookie |
 | GET | `/api/auth/me` | cookie | Current user, or 401 |
-| POST | `/api/ingest` | — (see note) | Submit a night of epochs (`{userId, epochs, meta}`), returns the scored session |
+| POST | `/api/devices` | cookie | `{name}` → pairs a new device, returns its API key (shown once, never again) |
+| GET | `/api/devices` | cookie | List the logged-in user's devices with `lastSeenAt` |
+| DELETE | `/api/devices/:id` | cookie | Revoke a device - its API key stops working immediately |
+| POST | `/api/ingest` | device key | `{epochs, meta}` → scores and stores the night, updates the device's `lastSeenAt` |
 | GET | `/api/sleep/latest` | cookie | Most recent scored session for the logged-in user |
-| GET | `/api/sleep/history?limit=14` | cookie | Recent sessions, oldest first, for trend charts |
+| GET | `/api/sleep/history?limit=14` | cookie | Recent sessions, oldest first, for trend charts and the calendar |
 | POST | `/api/demo/generate` | cookie | Generates and ingests a synthetic night for the logged-in user (`profile`: `good`\|`restless`\|`stressed`, `daysAgo`: backdates `createdAt` so repeated calls spread across the calendar instead of stacking on today) |
 
 `/api/ingest` is the device path (the ESP32 has no browser session), so
-it's authenticated by an explicit `userId` in the body rather than the
-cookie - see the comment in `src/routes/ingest.js` for the production
-hardening this needs (a per-device API key).
+it's authenticated by `Authorization: Bearer <device API key>` instead of
+the cookie - see [`docs/architecture.md`](../docs/architecture.md#auth) for
+how device pairing works.
 
 ## Data model
 
@@ -63,10 +66,9 @@ never depend on an external API.
 # Option A: one-click, from the dashboard - sign up, then "+ add another
 # sample night" (or the onboarding CTA on a brand-new account)
 
-# Option B: from the command line - --user must be a real account's id
-# (sign up in the dashboard first, copy it from GET /api/auth/me), since
-# /api/ingest now rejects unknown users
-python scripts/simulate_device.py --host http://localhost:8787 --user <your-account-id> --profile stressed
+# Option B: from the command line - --device-key comes from the dashboard's
+# "Your band" section ("+ connect a band"), shown once at creation time
+python scripts/simulate_device.py --host http://localhost:8787 --device-key zs_... --profile stressed
 ```
 
 ## Tests & linting

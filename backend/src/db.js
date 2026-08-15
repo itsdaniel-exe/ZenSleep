@@ -23,6 +23,41 @@ export async function getUserById(db, id) {
 }
 
 /** @param {D1Database} db */
+export async function createDevice(db, { id, userId, name, apiKeyHash, createdAt }) {
+  await db
+    .prepare(`INSERT INTO devices (id, user_id, name, api_key_hash, created_at) VALUES (?, ?, ?, ?, ?)`)
+    .bind(id, userId, name, apiKeyHash, createdAt)
+    .run();
+}
+
+/** @param {D1Database} db */
+export async function getDevicesByUser(db, userId) {
+  const { results } = await db
+    .prepare(`SELECT id, name, created_at, last_seen_at FROM devices WHERE user_id = ? ORDER BY created_at DESC`)
+    .bind(userId)
+    .all();
+  return results.map((r) => ({ id: r.id, name: r.name, createdAt: r.created_at, lastSeenAt: r.last_seen_at }));
+}
+
+/** @param {D1Database} db */
+export async function getDeviceByApiKeyHash(db, apiKeyHash) {
+  const row = await db.prepare(`SELECT * FROM devices WHERE api_key_hash = ?`).bind(apiKeyHash).first();
+  if (!row) return null;
+  return { id: row.id, userId: row.user_id, name: row.name, lastSeenAt: row.last_seen_at };
+}
+
+/** @param {D1Database} db */
+export async function touchDeviceLastSeen(db, deviceId, ts) {
+  await db.prepare(`UPDATE devices SET last_seen_at = ? WHERE id = ?`).bind(ts, deviceId).run();
+}
+
+/** @returns {Promise<boolean>} true if a device was actually deleted */
+export async function deleteDevice(db, deviceId, userId) {
+  const res = await db.prepare(`DELETE FROM devices WHERE id = ? AND user_id = ?`).bind(deviceId, userId).run();
+  return res.meta.changes > 0;
+}
+
+/** @param {D1Database} db */
 export async function saveSession(db, session) {
   await db
     .prepare(

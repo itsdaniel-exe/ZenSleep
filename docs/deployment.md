@@ -82,6 +82,19 @@ against `wrangler dev`'s API - see [`web/README.md`](../web/README.md).
   `backend/src/index.js` only matters for local dev, where the Vite dev
   server and `wrangler dev` run on different ports).
 
+## Gotcha: *.workers.dev blocks generic User-Agents
+
+Cloudflare applies baseline bot protection to the shared `*.workers.dev`
+domain (not something this project configured) that 403s requests with no
+User-Agent or a generic scripted one - e.g. Python's default
+`Python-urllib/3.x` gets a `403` with body `error code: 1010`, even though
+the exact same request from curl or a browser works fine. Doesn't affect
+the deployed dashboard (real browsers) or the firmware (`User-Agent:
+ZenSleepBand/1.0` is set explicitly - see `uploadNight()` in the `.ino`);
+only matters for your own scripts hitting the API directly. `scripts/simulate_device.py`
+sets an explicit `User-Agent` for exactly this reason. A custom domain
+instead of `*.workers.dev` wouldn't have this at all.
+
 ## Platform limits worth knowing
 
 | Limit (free tier) | Value |

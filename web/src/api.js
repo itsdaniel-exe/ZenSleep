@@ -54,3 +54,15 @@ export function getHistory(limit = 14) {
 export function generateDemoNight(profile, daysAgo = 0) {
   return request("/api/demo/generate", { method: "POST", body: JSON.stringify({ profile, daysAgo }) });
 }
+
+export function createDevice(name) {
+  return request("/api/devices", { method: "POST", body: JSON.stringify({ name }) });
+}
+
+export function getDevices() {
+  return request("/api/devices");
+}
+
+export function deleteDevice(id) {
+  return request(`/api/devices/${encodeURIComponent(id)}`, { method: "DELETE" });
+}

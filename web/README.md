@@ -55,6 +55,11 @@ call the backend's synthetic-data endpoint.
   clicking a day updates the selection in `App.jsx`.
 - `components/SleepDetails.jsx` - metrics, motion timeline (latest night
   only - see `docs/architecture.md`), and the score trend chart.
+- `components/WeeklySummary.jsx` - last-7-vs-prior-7 average, best/roughest
+  night, computed client-side from the `history` already fetched for the
+  calendar (no extra API call).
+- `components/DevicesPanel.jsx` - pair a band (shows the generated API key
+  once), list devices with a live/stale indicator from `lastSeenAt`, revoke.
 - `components/ScoreRing.jsx` / `ScoreGauge.jsx` - the score ring is a bare,
   embeddable SVG (`ScoreRing`); `ScoreGauge` wraps it in a card for the
   landing page's hero visual only.

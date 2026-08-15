@@ -5,6 +5,8 @@ import Header from "./components/Header.jsx";
 import SleepReport from "./components/SleepReport.jsx";
 import SleepCalendar from "./components/SleepCalendar.jsx";
 import SleepDetails from "./components/SleepDetails.jsx";
+import WeeklySummary from "./components/WeeklySummary.jsx";
+import DevicesPanel from "./components/DevicesPanel.jsx";
 import { SampleDataOnboarding, SampleDataUtility } from "./components/SampleDataPanel.jsx";
 
 const HISTORY_LIMIT = 90; // enough to populate a few months of the calendar
@@ -126,12 +128,14 @@ export default function App() {
       ) : !displayed ? (
         <div className="empty-state">
           <h2>No sleep data yet</h2>
-          <p>No band connected to this account yet. Once one is, nights will show up here automatically.</p>
+          <p>Connect your band below to start tracking, or try it with sample data first.</p>
+          <DevicesPanel />
           <SampleDataOnboarding onGenerate={handleGenerate} generating={generating} />
         </div>
       ) : (
         <main className="dashboard">
           <SleepReport session={displayed} delta={delta} />
+          <WeeklySummary history={history} />
           {history.length > 1 && (
             <SleepCalendar history={history} selectedId={displayed.id} onSelectDay={(s) => setSelectedId(s.id)} />
           )}
@@ -141,6 +145,7 @@ export default function App() {
             hasEpochsElsewhere={!isLatestSelected}
             history={history.slice(-14)}
           />
+          <DevicesPanel />
           <div className="dashboard-footer">
             <SampleDataUtility onGenerate={handleGenerate} generating={generating} />
           </div>
