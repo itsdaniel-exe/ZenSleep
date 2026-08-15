@@ -1,6 +1,6 @@
 # Architecture
 
-ZenSleep is a hardware-to-dashboard pipeline: a non-wearable-friendly band
+ZenSleep is a hardware-to-dashboard pipeline: a band with nothing to strap on
 captures raw motion + heart-rate signals, a backend turns them into a sleep
 score and stress inference, and a web dashboard presents the result with
 personalized recommendations. Everything server-side runs as a single
@@ -45,7 +45,7 @@ flowchart LR
 
 - **Epochs, not raw samples.** The wearable pre-aggregates into 30-second
   windows before sending, keeping payloads small and battery use low —
-  matches the pitch's non-wearable-comfort and long-battery-life goals.
+  matches the pitch's comfort and long-battery-life goals.
 - **Scoring is deterministic and local to the backend**, not delegated to an
   LLM. The AI layer only adds a narrative gloss on top of numbers that are
   already trustworthy and explainable — important for a health-adjacent

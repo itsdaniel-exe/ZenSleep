@@ -39,8 +39,8 @@ sleep patterns.
 
 ## How ZenSleep addresses this
 
-A non-wearable-friction band (ESP32 + motion/heart-rate sensors) captures
-overnight movement and heart-rate signals, which a scoring engine converts
+A band with nothing to wear on your body (ESP32 + motion/heart-rate sensors)
+captures overnight movement and heart-rate signals, which a scoring engine converts
 into a sleep score, a stress-level inference, and specific, prioritized
 recommendations — not just raw numbers. See [`architecture.md`](architecture.md)
 for how that pipeline is implemented in this repo, and
